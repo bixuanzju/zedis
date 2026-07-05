@@ -418,11 +418,6 @@ pub fn writeAof(self: *Server, command_name: []const u8, args: []const Value) vo
 pub fn listen(self: *Server) !void {
     // Spawn store thread AFTER server is in final location
     self.store_thread = try std.Thread.spawn(.{}, storeThreadLoop, .{self});
-    defer {
-        self.store_thread_stop.store(true, .release);
-        self.command_queue_event.set(self.io);
-        self.store_thread.?.join();
-    }
 
     var connection_group: Io.Group = .init;
     defer connection_group.wait(self.io); // Wait for all clients to finish
